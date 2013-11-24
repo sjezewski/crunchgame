@@ -1,0 +1,10 @@
+{
+	"host_map": [
+		"$.crunchbase.com => www.crunchbase.com",
+		"$.crunchbase.com => crunchbase.com",
+		"$.m.crunchbase.com => m.crunchbase.com",
+		"$.link.crunchbase.com => link.crunchbase.com",
+		"$.info.crunchbase.com => info.crunchbase.com",
+		"$.developer.crunchbase.com => developer.crunchbase.com"
+	]
+}
