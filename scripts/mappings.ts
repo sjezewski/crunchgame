@@ -18,9 +18,19 @@ match($status) {
     log("--> STATUS: 200")
 
     match($path) {
+      with(/\?.*?info=true/) {
+        $info = "true"
+      }
+    }
+
+    match($path) {
       with(/^\/$|^\/\?/) {
         log("--> Importing pages/home.ts in mappings.ts")
         @import pages/home.ts
+      }
+      with(/^\/company/) {
+        log("--> Importing pages/company.ts in mappings.ts")
+        @import pages/company.ts
       }
       else() {
         log("--> No page match in mappings.ts")
