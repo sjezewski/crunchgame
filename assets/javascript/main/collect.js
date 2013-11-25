@@ -9,7 +9,7 @@ function gather_companies(person_name, raw_data) {
     console.log("connection data:");
     console.log(data);
     var companies = data["companies"];
-    people[data["name"]] = data;
+    visited.people[data["name"]] = data;
 
 
     for(var i = 0; i < companies.length; i++) { 
@@ -17,12 +17,12 @@ function gather_companies(person_name, raw_data) {
 	console.log("compan info:");
 	console.log(company);
 
-	console.log("already seen?");
-	console.log(companies[company]);
+	console.log("already seen? " + company);
+	console.log(visited.companies[company] === undefined);
 
-	if(companies[company] === undefined) {
+	if(visited.companies[company] === undefined) {
 	    console.log("adding company:" + company);
-	    companies[company] = {};	    
+	    visited.companies[company] = {};	    
 
 	    var callback = function() {
 		display(person_name, company, this.responseText);
@@ -52,6 +52,7 @@ function gather_people() {
 function display(person, company, raw_data) {
 
     var d = document.createElement("div");
+    d.setAttribute("class", "company");
     d.innerHTML = raw_data;
     container.appendChild(d);
     console.log("added " + company + " via " + person);
@@ -66,8 +67,12 @@ function display(person, company, raw_data) {
 
 function initialize() {
     container = x$("#related")[0];
-    people = {};
-    companies = {};
+    visited = {
+	people:{},
+        companies:{}
+    }
+    visited.companies[window.location.pathname] = {};
+
     ajax(window.location.href + "?json=true",gather_people); 
 }
 
