@@ -1,7 +1,5 @@
 # Company
 
-
-
 $("//body") {
   insert_before("div", id: "full_content") {
     move_here("//body/*")
@@ -12,8 +10,13 @@ $("//body") {
   inject(read("company.html"))
 
   $$("#full_content") {
-    $("//div[@id='breadcrumbs']/span[last()]") {
-      move_to("//div[@class='info name']")
+    $("//div[@class='info']/a") {
+      attribute("href", $path)
+    }
+
+    $name = fetch("//div[@id='breadcrumbs']/span[last()]/text()")
+    $("//div[@class='name']") {
+      text($name)
     }
     
     $employees = fetch("//*[@id='num_employees']/text()")
@@ -34,7 +37,7 @@ $("//body") {
         } else() {
           text($founded)
         }
-      }
+      } 
     }
 
     $funding = fetch("//strong[contains(text(),'FUNDING TOTAL')]/../../td[last()]/strong/text()")
@@ -43,16 +46,22 @@ $("//body") {
     }
 
     $("//div[@id='company_logo']//img") {
-      move_to("//div[@class='info logo']")
+      $logo = attribute("src")
+      move_to("//div[@class='logo']")
     }
 
     $("//h2[contains(text(), 'Tags')]/following-sibling::div//a[contains(@href,'tag')]") {
       wrap("span") {
-        move_to("//div[@class='info tags']")
+        move_to("//div[@class='tags']")
       }
     }
 
-
   }
 
+}
+
+match($fragment, "true") {
+  $("//div[@class='company current']") {
+    $fragment = inner()
+  }  
 }

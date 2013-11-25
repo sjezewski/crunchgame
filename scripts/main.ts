@@ -1,5 +1,9 @@
 # The main file executed by Tritium. The start of all other files.
 
+match($path, /\?.*?fragment=true/) {
+  $fragment = "true"
+}
+
 match(inferred_content_type()) {
   with(/html/) {
     replace(/fb:/, "fbn_") # Rewrite the xmlns facebook nodes before the html parser clobbers them
@@ -19,4 +23,8 @@ match(inferred_content_type()) {
   else() {
     log("Passing through " + $content_type + " unmodified.")
   }
+}
+
+match_not($fragment, "") {
+  set($fragment)
 }
