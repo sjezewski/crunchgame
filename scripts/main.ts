@@ -1,8 +1,6 @@
 # The main file executed by Tritium. The start of all other files.
 
-match($path, /\?.*?fragment=true/) {
-  $fragment = "true"
-}
+@import modifiers.ts
 
 match(inferred_content_type()) {
   with(/html/) {
@@ -25,6 +23,4 @@ match(inferred_content_type()) {
   }
 }
 
-match_not($fragment, "") {
-  set($fragment)
-}
+@import post_modifiers.ts

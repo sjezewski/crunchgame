@@ -65,3 +65,13 @@ match($fragment, "true") {
     $fragment = inner()
   }  
 }
+
+$companies = ""
+
+$("//a[contains(@href, '/person/')]") {
+  $people = $people + "\"" + fetch("./@href") + "\","
+}
+
+
+
+
