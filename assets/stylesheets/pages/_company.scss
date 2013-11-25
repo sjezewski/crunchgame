@@ -18,7 +18,11 @@
   border-radius: 30px;
   max-width: 400px;
  
-  .current {
+  &:focus {
+    border-color: #22DD44;
+  }
+
+  &.current {
     border-style: solid;
   }
 

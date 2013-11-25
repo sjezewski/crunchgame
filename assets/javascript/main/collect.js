@@ -53,6 +53,7 @@ function display(person, company, raw_data) {
 
     var d = document.createElement("div");
     d.setAttribute("class", "company related");
+    d.setAttribute("tabindex", connections++);
     d.innerHTML = raw_data;
     container.appendChild(d);
     console.log("added " + company + " via " + person);
@@ -64,7 +65,9 @@ function initialize() {
     visited = {
 	people:{},
         companies:{}
-    }
+    };
+    connections = 1;
+
     visited.companies[window.location.pathname] = {};
 
     ajax(window.location.href + "?json=true",gather_people); 
