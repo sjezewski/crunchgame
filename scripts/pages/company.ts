@@ -68,7 +68,7 @@ match($fragment, "true") {
 
 $companies = ""
 
-$("//a[contains(@href, '/person/')]") {
+$("//a[contains(@href, '/person/') and not(contains(@href, 'edit'))]") {
   $people = $people + "\"" + fetch("./@href") + "\","
 }
 

@@ -9,18 +9,27 @@ function gather_companies(person_name, raw_data) {
     console.log("connection data:");
     console.log(data);
     var companies = data["companies"];
-    person[data["name"]] = data;
+    people[data["name"]] = data;
 
 
     for(var i = 0; i < companies.length; i++) { 
 	var company = companies[i];
 	console.log("compan info:");
 	console.log(company);
-	var callback = function() {
-	    display(person_name, company, this.responseText);
-	}
+
+	console.log("already seen?");
+	console.log(companies[company]);
+
+	if(companies[company] === undefined) {
+	    console.log("adding company:" + company);
+	    companies[company] = {};	    
+
+	    var callback = function() {
+		display(person_name, company, this.responseText);
+	    }
  
-	ajax(company +  "?fragment=true", callback);
+  	    ajax(company +  "?fragment=true", callback);
+	}
     }
 }
 
@@ -45,18 +54,20 @@ function display(person, company, raw_data) {
     var d = document.createElement("div");
     d.innerHTML = raw_data;
     container.appendChild(d);
+    console.log("added " + company + " via " + person);
 
-    console.log("connector/connection/data");
-    console.log(person);
-    console.log(company);
-    console.log(raw_data);
+
+    //console.log("connector/connection/data");
+    //    console.log(person);
+    //console.log(company);
+    //console.log(raw_data);
 
 }
 
 function initialize() {
     container = x$("#related")[0];
-    person = {};
-    company = {};
+    people = {};
+    companies = {};
     ajax(window.location.href + "?json=true",gather_people); 
 }
 
