@@ -11,7 +11,11 @@ $("//body") {
 
   $$("#full_content") {
     $("//div[@class='info']/a") {
-      attribute("href", $path)
+      $normalized_path = $path
+      $normalized_path {
+        replace(/(.*?)\?.*/, "$1")
+      }
+      attribute("href", $normalized_path)
     }
 
     $name = fetch("//div[@id='breadcrumbs']/span[last()]/text()")

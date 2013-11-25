@@ -58,15 +58,30 @@ function display(person, company, raw_data) {
     container.appendChild(d);
     console.log("added " + company + " via " + person);
 
+    d.addEventListener('keypress', navigate);
+}
+
+function navigate(event) {
+    
+    if (event.keyCode != 13) {
+	return;
+    }
+    
+    var company = event.target;
+    var a = x$(company).find(".info a")[0];
+    a.click();
 }
 
 function initialize() {
     container = x$("#related")[0];
+
+    x$(".company.current")[0].addEventListener('keypress',navigate,false);
+
     visited = {
 	people:{},
         companies:{}
     };
-    connections = 1;
+    connections = 2;
 
     visited.companies[window.location.pathname] = {};
 
