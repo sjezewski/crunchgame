@@ -1,0 +1,3 @@
+- locally cache the raw company html fragments
+- display the connection mechanisms per company
+- display the ranks of each associated company
