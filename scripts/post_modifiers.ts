@@ -2,6 +2,8 @@ match_not($fragment, "") {
   set($fragment)
 }
 
+match_not($json, "") {
+
 match($path) {
   with(/^\/company/) {
     set(read("pages/company.json"))
@@ -30,10 +32,5 @@ match($path) {
   }
 
 }
-
-
-match_not($json, "") {
-
-
 
 }
