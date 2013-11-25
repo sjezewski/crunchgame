@@ -52,16 +52,10 @@ function gather_people() {
 function display(person, company, raw_data) {
 
     var d = document.createElement("div");
-    d.setAttribute("class", "company");
+    d.setAttribute("class", "company related");
     d.innerHTML = raw_data;
     container.appendChild(d);
     console.log("added " + company + " via " + person);
-
-
-    //console.log("connector/connection/data");
-    //    console.log(person);
-    //console.log(company);
-    //console.log(raw_data);
 
 }
 

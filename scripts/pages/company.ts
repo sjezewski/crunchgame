@@ -42,12 +42,21 @@ $("//body") {
 
     $funding = fetch("//strong[contains(text(),'FUNDING TOTAL')]/../../td[last()]/strong/text()")
     $("//div[@class='funding']/span") {
-      text($funding)
+      match($funding) {
+        with("") {
+	  remove("..")
+	} else() {
+	  text($funding)  
+	}
+      }
     }
 
     $("//div[@id='company_logo']//img") {
       $logo = attribute("src")
       move_to("//div[@class='logo']")
+      $("//div[@class='name']") {
+        attribute("class", "name redundant")
+      }
     }
 
     $("//h2[contains(text(), 'Tags')]/following-sibling::div//a[contains(@href,'tag')]") {
