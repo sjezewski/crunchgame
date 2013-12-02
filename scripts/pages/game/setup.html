@@ -6,10 +6,14 @@
 
 <hr/>
 
-<form class='options' action='/?start_game=true'>
+<form class='options' action='./'>
     
+  <input type='hidden' name='game' value='start'/>
+  <!-- Nice trick to pass along the q param to route to the next template (start) -->
+
   <label for='start'> Starting Company: </label>
   <input name='start' type='text' value='moovweb'> </input>
+  <input type='hidden' name='finish'/>
   
   <p></p>
 

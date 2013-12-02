@@ -109,9 +109,8 @@ function merge(a,b) {
     return a;
 }
 
-function setup_game() {
-    
-    g = new Game(gather_options());
+function new_game() {
+   return new Game(gather_options());
 }
 
 function gather_options() {
@@ -127,6 +126,7 @@ function Game(options) {
     this.options = merge(options, defaults);
     this.solution = {};
     this.current = [this.options.start];
+    this.generate();
 }
 
 var defaults ={
@@ -186,14 +186,20 @@ Game.prototype = {
 
 	return reject;
     },
-    revert: function() {
-
-    },
     start: function() {
 	window.location.href = this.options.start;
     },
     setup_complete: function() {
-	this.display();
+	this.setup = true;
+	x$("input[name='finish']")[0].value = link_to_name(this.current.last());
+	localStorage.solution = JSON.stringify(this.solution);
+	x$("form")[0].submit();
+    },
+    setup_failed: function() {
+
+    },
+    check_progress: function() {
+	
     },
     finish: function() {
 	
@@ -211,8 +217,5 @@ Game.prototype = {
     }
     
 };
-
-
-window.addEventListener('load',function(){ setup_game(); g.generate();});
 
 

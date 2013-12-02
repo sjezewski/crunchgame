@@ -22,12 +22,8 @@ match($status) {
         $info = "true"
       }
     }
-
+    log("PATH: "  + $path)
     match($path) {
-      with(/^\/$|^\/\?/) {
-        log("--> Importing pages/home.ts in mappings.ts")
-        @import pages/home.ts
-      }
       with(/game=setup/) {
         log("--> Importing pages/game/setup.ts in mappings.ts")
         @import pages/game/setup.ts
@@ -35,6 +31,10 @@ match($status) {
       with(/game=start/) {
         log("--> Importing pages/game/start.ts in mappings.ts")
         @import pages/game/start.ts
+      }
+      with(/^\/$|^\/\?/) {
+        log("--> Importing pages/home.ts in mappings.ts")
+        @import pages/home.ts
       }
       with(/^\/company/) {
         log("--> Importing pages/company.ts in mappings.ts")
