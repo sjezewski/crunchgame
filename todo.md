@@ -12,6 +12,7 @@ To be done:
 - check and report time elapsed for game
 - make advanced form where you can specify end (w no guarantees)
 - use a 3rd party service so that people can share games
+- make deadend info cached (in localstorage) so it can be re-used
 - add a countdown?
 
 Questions:

@@ -110,14 +110,38 @@ function merge(a,b) {
 }
 
 function new_game() {
-   return new Game(gather_options());
+   g = new Game(gather_options());
+   g.generate();
+   return g;
+}
+
+function load_game() {
+    var saved_game = load_game_data();
+
+    g = new Game(saved_game);
+    g.solution = saved_game.solution;    
+}
+
+function load_game_data() {
+    try {
+	return JSON.parse(localStorage.game);
+    } catch(e) {
+	console.log("failed to load / parse game data:", e);
+    }
+
 }
 
 function gather_options() {
     var options = {};
+
     for(var option in defaults) {
-	options[option] = x$("input[name='" + name + "']").value;
+	var value = x$("input[name='" + option + "']")[0].value;
+	console.log("gathered option:" + value);
+	options[option] = value;
     }
+
+    console.log("loaded options:",options);
+
     return options;
 }
 
@@ -126,7 +150,6 @@ function Game(options) {
     this.options = merge(options, defaults);
     this.solution = {};
     this.current = [this.options.start];
-    this.generate();
 }
 
 var defaults ={
@@ -142,6 +165,15 @@ Game.prototype = {
 	this.deadends = {}; // people w no net new edges (should add companies as well)
 	this.data = {};
 	company_to_people(this, this.options.degrees-1);
+    },
+    save: function() {
+	var game_data = {};
+
+	for(var field in this.options) {
+	    game_data[field] = this.options[field];
+	}
+	game_data.solution = this.solution;
+	localStorage.game = JSON.stringify(game_data);
     },
     scrub: function(vertices) {
 	// Given the options for the next jump, remove steps we've already used
@@ -192,17 +224,43 @@ Game.prototype = {
     setup_complete: function() {
 	this.setup = true;
 	x$("input[name='finish']")[0].value = link_to_name(this.current.last());
-	localStorage.solution = JSON.stringify(this.solution);
+	this.save();
 	x$("form")[0].submit();
     },
     setup_failed: function() {
 
     },
     check_progress: function() {
-	
+	var user_current = link_to_name(window.location.pathname);
+	var done = false;
+	var current = this.options.start;
+	var progress = 1;
+	if(current == user_current) {
+	    return
+	}
+
+	while(!done) {
+	    progress++;
+	    var next = this.solution[current];
+	    if(next == user_current || next === undefined) {
+		done = true;
+	    }
+	    if( progress > this.options.degrees) {
+		done=true;
+		console.log("went too far!!!");
+	    }
+	}
+
+	this.progress = progress;
+
+	if(progress == this.options.degrees) {
+	    this.finish();
+	}
+
     },
     finish: function() {
-	
+	this.display();
+	alert("You won the game!");	
     },
     solution: function() {
 	
