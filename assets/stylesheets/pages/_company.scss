@@ -39,6 +39,53 @@
     max-height: 80px;
   }
 
+  .count {
+    border: 10px dotted orange;
+    padding: 5px;
+    border-radius: 30px;
+    display: inline-block;
+    vertical-align: top;
+    margin: 10px;
+    text-align: center;
+    width: 20px;
+    color: orange;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: sans-serif;
+  }
+
+  .connections {
+    margin-left: 30px;
+    top:-10px;
+    position:relative;
+
+    .connection {
+      padding:10px;
+      border: 10px solid orange;
+      border-top: 0px;
+
+      border-right: 0px;
+      margin: 10px 0px;
+      height: 5px;
+
+      > a {
+        text-decoration: none;
+	color: orange;
+	font-size: 30px;
+	font-weight: bold;
+	font-family: sans-serif;
+	background-color: white;
+	padding: 0px 10px;
+	position:relative;
+	top:2px;
+	display:inline-block;
+	width:100%;
+      }
+
+    }
+
+  }
+	
 
 }
 
