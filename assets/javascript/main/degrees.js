@@ -37,25 +37,6 @@ function person_to_company(game, remaining_degrees, person) {
 		this_game.visited[this_person] = true;
 		this_game.data[this_person] = data;
 		console.log("RANDOMLY CHOSE COMPANY (" + r + "):" + company);
-		/*x
-		if(company == this_game.current) {
-		    console.log("rejected ... same as current");
-		    company_to_people(this_game, degrees+1);
-		    return
-		    
-		} else if(this_game.solution[company] !== undefined) {
-		    console.log("rejected ... already seen this company");
-		    company_to_people(this_game, degrees+1);
-		    return
-		}
-*/
-
-		/*
-		if(this_game.reject(company)) {
-		    console.log("REJECTED");
-		    company_to_people(this_game, degrees+1);
-		    return
-		    }*/
 		
 		this_game.solution[game.current.last()] = company;
 		this_game.current.push(company);
@@ -102,6 +83,8 @@ function company_to_people(game, remaining_degrees) {
 		//		person_to_company(this_game,degrees+1,person);
 
 	    }
+
+	    people = scrubbed;
 
 	    var r = parseInt(Math.random()*people.length);
 	    var person = people[r];
@@ -158,7 +141,7 @@ Game.prototype = {
 	this.visited = {};
 	this.deadends = {}; // people w no net new edges (should add companies as well)
 	this.data = {};
-	company_to_people(this, this.options.degrees);
+	company_to_people(this, this.options.degrees-1);
     },
     scrub: function(vertices) {
 	// Given the options for the next jump, remove steps we've already used
