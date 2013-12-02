@@ -5,21 +5,65 @@
 
 function person_to_company(game, remaining_degrees, person) {
 
-    var callback = (function(this_game, degrees){
+    var callback = (function(this_game, degrees, this_person){
 	    return function() {
-		var companies = JSON.parse(this.responseText).companies;
+		var data = JSON.parse(this.responseText);
+		var companies = data.companies;
+		var scrubbed = this_game.scrub(companies);
+		console.log(this_person + ">>>>>>>>>>");
 		console.log("got companies:");
 		console.log(companies);		
+		console.log("scrubeed companies:");
+		console.log(scrubbed);
+
+
+
+		if(scrubbed.length == 0) {
+		    if (this_game.current.length != 1) {
+			// If this company has only deadend people ... will have to detect in the other callback
+			//			var last = this_game.current.pop();
+			// I should only pop companies when I know all the people are deadends
+
+		    }
+		    console.log("going back a step ... undoing (" + this_game.current.last() + ") and retrying " + this_game.current.last());
+		    this_game.deadends[this_person] = true;
+		    company_to_people(this_game, degrees+1);		    
+		    return
+		}
+		companies = scrubbed;
 
 		var r = parseInt(Math.random()*companies.length);
 		company = companies[r];
+		this_game.visited[this_person] = true;
+		this_game.data[this_person] = data;
 		console.log("RANDOMLY CHOSE COMPANY (" + r + "):" + company);
-		game.solution[game.current] = company;
-		game.current = company;
+		/*x
+		if(company == this_game.current) {
+		    console.log("rejected ... same as current");
+		    company_to_people(this_game, degrees+1);
+		    return
+		    
+		} else if(this_game.solution[company] !== undefined) {
+		    console.log("rejected ... already seen this company");
+		    company_to_people(this_game, degrees+1);
+		    return
+		}
+*/
 
-		//		company_to_people(this_game, degrees);
+		/*
+		if(this_game.reject(company)) {
+		    console.log("REJECTED");
+		    company_to_people(this_game, degrees+1);
+		    return
+		    }*/
+		
+		this_game.solution[game.current.last()] = company;
+		this_game.current.push(company);
+
+		console.log(degrees + " left to go");
+		company_to_people(this_game, degrees);
 	    }
-	})(game, remaining_degrees);
+	})(game, remaining_degrees, person);
 
     ajax(person + "?json=true", callback);
 }
@@ -28,23 +72,49 @@ function person_to_company(game, remaining_degrees, person) {
 function company_to_people(game, remaining_degrees) {
     // Later I'll add an option to hop btw people
 
-    var callback = (function(this_game, degrees){
+    if(remaining_degrees == 0) {
+	game.setup_complete();
+	return
+    }
+
+    var callback = (function(this_game, degrees, this_company){
 	return function() {
 	    console.log("raw:");
 	    console.log(this);
-	    var people = JSON.parse(this.responseText).people;
+	    var data = JSON.parse(this.responseText);
+	    var people = data.people;
 	    console.log("got people");
 	    console.log(people);
 
+	    var scrubbed = this_game.scrub(people);
+
+	    if(scrubbed.length == 0) {
+		console.log("this company is a deadend!");
+		var last = this_game.current.pop();
+		this_game.deadends[last] = true;
+		console.log("reverting company :" + last);
+		if(this_game.current.length == 0){ 
+		    console.log("ERROR! Starting company is a dead end! It doesn't have sufficient degree");
+		    return
+		}
+		company_to_people(this_game, degrees+1);
+		return
+		//		person_to_company(this_game,degrees+1,person);
+
+	    }
+
 	    var r = parseInt(Math.random()*people.length);
+	    var person = people[r];
 
-	    console.log("RANDOMLY CHOSE PERSON(" + r + "):" + people[r]);
+	    console.log("RANDOMLY CHOSE PERSON(" + r + "):" + person);
+	    this_game.visited[this_company] = true;
+	    this_game.data[this_company] = data;
 
-	    person_to_company(this_game,degrees,people[r]);
+	    person_to_company(this_game,degrees,person);
 	}
-    })(game, remaining_degrees-1);
+	})(game, remaining_degrees-1, game.current.last());
 
-    ajax(game.current + "?json=true", callback);
+    ajax(game.current.last() + "?json=true", callback);
 
 
 }
@@ -73,22 +143,74 @@ function Game(options) {
 
     this.options = merge(options, defaults);
     this.solution = {};
-    this.current = this.options.start;
+    this.current = [this.options.start];
 }
 
 var defaults ={
 	'degrees':6,
 	'any':false,
-	'start':'moovweb'
+	'start':'/company/moovweb'
 };
 
 Game.prototype = {
 
     generate: function() {
+	this.visited = {};
+	this.deadends = {}; // people w no net new edges (should add companies as well)
+	this.data = {};
 	company_to_people(this, this.options.degrees);
     },
+    scrub: function(vertices) {
+	// Given the options for the next jump, remove steps we've already used
+	var i=-1;
+	var done = false;
+	var lastIndex = vertices.length;
+	while(!done) {
+	    i++;
+	    console.log("checking [" + i + "]: " + vertices[i]);
+	    if(this.reject(vertices[i])) {
+		console.log("removing " + i + "th entry : " + vertices[i]);
+		console.log("before:");
+		console.log(vertices); 
+		vertices = vertices.slice(0,i).concat(vertices.slice(i+1,vertices.length));
+		console.log("after:");
+		console.log(vertices); 
+		i--;
+		lastIndex--;
+	    }
+
+	    if(i == lastIndex) {
+		done = true;
+	    }
+
+	}
+	return vertices;
+    },
+
+    reject: function(new_value) {
+	var reject = false;
+	console.log("last:" + this.current.last());
+	console.log("seen before:" + this.solution[new_value]);
+	if(new_value == this.current.last() || this.solution[new_value] !== undefined) {
+	    console.log("rejected ... same as current");
+	    console.log("rejected ... already seen this company");
+	    reject = true;
+	}	
+	if(this.deadends[new_value] !== undefined) {
+	    console.log("rejected ... " + new_value + " is a deadend");
+	    reject = true;
+	}
+
+	return reject;
+    },
+    revert: function() {
+
+    },
     start: function() {
-	window.location.href = this.start;
+	window.location.href = this.options.start;
+    },
+    setup_complete: function() {
+	this.display();
     },
     finish: function() {
 	
@@ -97,12 +219,17 @@ Game.prototype = {
 	
     },
     display: function() {
-
+	var current = this.options.start;
+	var count = this.options.degrees;
+	while(count--) {
+	    console.log(current + " >> " + this.solution[current]);
+	    current = this.solution[current];
+	}
     }
     
 };
 
 
-
+window.addEventListener('load',function(){ setup_game(); g.generate();});
 
 
