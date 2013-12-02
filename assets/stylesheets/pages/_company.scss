@@ -1,6 +1,11 @@
 
-.info.name {
-  display: none;
+.info {
+  > a {
+    font-weight: bold;
+    font-size: 32px;
+    font-style: sans-serif;
+    text-decoration: none;
+  }
 }
 
 #content {
