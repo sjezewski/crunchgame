@@ -3,21 +3,48 @@
 
 // TODO: Mark progress in degrees in special banner
 
-function random_person_to_company(game, remaining_degrees, from_company) {
+function person_to_company(game, remaining_degrees, person) {
 
+    var callback = (function(this_game, degrees){
+	    return function() {
+		var companies = JSON.parse(this.responseText).companies;
+		console.log("got companies:");
+		console.log(companies);		
+
+		var r = parseInt(Math.random()*companies.length);
+		company = companies[r];
+		console.log("RANDOMLY CHOSE COMPANY (" + r + "):" + company);
+		game.solution[game.current] = company;
+		game.current = company;
+
+		//		company_to_people(this_game, degrees);
+	    }
+	})(game, remaining_degrees);
+
+    ajax(person + "?json=true", callback);
 }
 
 
-function company_to_people(game, remaining_degress, from_company) {
+function company_to_people(game, remaining_degrees) {
     // Later I'll add an option to hop btw people
 
-    var callback = (function(this_game, degrees, company){
-	    return function() {
-		random_crawl(this_game,degrees,company);
-	    }
-	})(game, remaining_degrees-1, from_company);
+    var callback = (function(this_game, degrees){
+	return function() {
+	    console.log("raw:");
+	    console.log(this);
+	    var people = JSON.parse(this.responseText).people;
+	    console.log("got people");
+	    console.log(people);
 
-    ajax(from_company + "?json=true", callback);
+	    var r = parseInt(Math.random()*people.length);
+
+	    console.log("RANDOMLY CHOSE PERSON(" + r + "):" + people[r]);
+
+	    person_to_company(this_game,degrees,people[r]);
+	}
+    })(game, remaining_degrees-1);
+
+    ajax(game.current + "?json=true", callback);
 
 
 }
@@ -35,27 +62,30 @@ function setup_game() {
 }
 
 function gather_options() {
-    var options = {'degrees','any','start'};
-    for(var option in options) {
+    var options = {};
+    for(var option in defaults) {
 	options[option] = x$("input[name='" + name + "']").value;
     }
     return options;
 }
 
 function Game(options) {
-    var defaults = {
+
+    this.options = merge(options, defaults);
+    this.solution = {};
+    this.current = this.options.start;
+}
+
+var defaults ={
 	'degrees':6,
 	'any':false,
 	'start':'moovweb'
-    };
-
-    this.options = merge(defaults,options);
-    this.solution = {};
-}
+};
 
 Game.prototype = {
+
     generate: function() {
-	random_crawl(this, this.options.degrees, this.options.start);
+	company_to_people(this, this.options.degrees);
     },
     start: function() {
 	window.location.href = this.start;

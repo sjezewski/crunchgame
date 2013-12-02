@@ -160,4 +160,13 @@ function initialize() {
     ajax(window.location.href + "?json=true",gather_people); 
 }
 
-window.addEventListener('load',initialize);
+
+
+window.addEventListener(
+    'load',
+    function() {
+	if(x$(".company.current")[0] !== undefined) {
+	    initialize();
+	}
+    }
+);
