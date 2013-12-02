@@ -93,8 +93,10 @@ function display_person(person, company) {
     var d = document.createElement("div");
     d.setAttribute("class", "person connection");
     d.innerHTML = "<a href='" + person + "'>" + link_to_name(person) + "</a>";
-    visited.companies[company].connections.appendChild(d);
-    visited.companies[company].count.innerHTML = parseInt(visited.companies[company].count.innerText) + 1; 
+
+    x$(visited.companies[company].element).find('.connections')[0].appendChild(d);
+    var count = x$(visited.companies[company].element).find('.count')[0];
+    count.innerHTML = parseInt(count.innerText) + 1; 
 }
 
 function display(person, company, raw_data) {
@@ -108,25 +110,18 @@ function display(person, company, raw_data) {
     console.log("added " + company + " via " + person);
     d.addEventListener('keypress', navigate);
 
-    var c = document.createElement("div");
-    c.setAttribute("class", "count");
-    c.innerHTML = "0";
-    d.appendChild(c);
-    visited.companies[company].count = c;
-
-    var people = document.createElement("div");
-    people.setAttribute("class", "connections");
-    d.appendChild(people);
-    visited.companies[company].connections = people;
-
     console.log("displayed: " + company);
     console.log(visited.companies[company]);
 
     display_person(person,company);
 
-    for(var i=0; i<visited.companies[company].display_callbacks.length; i++) {
-	console.log("calling callback");
-	visited.companies[company].display_callbacks[i]();
+    if(visited.companies[company].display_callbacks !== undefined) {
+
+	for(var i=0; i<visited.companies[company].display_callbacks.length; i++) {
+	    console.log("calling callback");
+	    visited.companies[company].display_callbacks[i]();
+	}
+
     }
     visited.companies[company].displayed = true;
 }
@@ -142,18 +137,25 @@ function navigate(event) {
     a.click();
 }
 
+
+
 function initialize() {
     container = x$("#related")[0];
 
-    x$(".company.current")[0].addEventListener('keypress',navigate,false);
+    var company = x$(".company.current")[0];
+    company.addEventListener('keypress',navigate,false);
 
     visited = {
 	people:{},
         companies:{}
     };
-    connections = 2;
-
-    visited.companies[window.location.pathname] = {};
+    connections = 0;
+    visited.companies[window.location.pathname] = {
+	displayed: true,
+	people: {},
+	element: company,
+	display_callbacks: []
+    };
 
     ajax(window.location.href + "?json=true",gather_people); 
 }
