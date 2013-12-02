@@ -1,10 +1,25 @@
 
 // Setup functions for generating a new game
 
+// TODO: Mark progress in degrees in special banner
 
-function random_crawl(from_company) {
+function random_person_to_company(game, remaining_degrees, from_company) {
+
+}
+
+
+function company_to_people(game, remaining_degress, from_company) {
     // Later I'll add an option to hop btw people
-    
+
+    var callback = (function(this_game, degrees, company){
+	    return function() {
+		random_crawl(this_game,degrees,company);
+	    }
+	})(game, remaining_degrees-1, from_company);
+
+    ajax(from_company + "?json=true", callback);
+
+
 }
 
 function merge(a,b) {
@@ -14,10 +29,18 @@ function merge(a,b) {
     return a;
 }
 
-function start_game(options) {
-    g = new Game(options);
+function setup_game() {
+    
+    g = new Game(gather_options());
 }
 
+function gather_options() {
+    var options = {'degrees','any','start'};
+    for(var option in options) {
+	options[option] = x$("input[name='" + name + "']").value;
+    }
+    return options;
+}
 
 function Game(options) {
     var defaults = {
@@ -32,16 +55,7 @@ function Game(options) {
 
 Game.prototype = {
     generate: function() {
-
-	var current = this.start;
-	var remaining = this.options.degrees;
-
-	while(remaining--) {
-	    var next = random_crawl(current);
-	    this.solution[current] = next;
-	    next = current;
-	}
-
+	random_crawl(this, this.options.degrees, this.options.start);
     },
     start: function() {
 	window.location.href = this.start;
