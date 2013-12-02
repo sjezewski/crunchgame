@@ -1,7 +1,6 @@
 function ajax(path, callback) {
     x$().xhr(path, {async: true,callback: callback});
 }
-
 function gather_companies(person_name, raw_data) {
     console.log("raw data:");
     console.log(raw_data);
@@ -14,7 +13,7 @@ function gather_companies(person_name, raw_data) {
 
     for(var i = 0; i < companies.length; i++) { 
 	var company = companies[i];
-	console.log("compan info:");
+	console.log("company info:");
 	console.log(company);
 
 	console.log("already seen? " + company);
@@ -22,15 +21,42 @@ function gather_companies(person_name, raw_data) {
 
 	if(visited.companies[company] === undefined) {
 	    console.log("adding company:" + company);
-	    visited.companies[company] = {};	    
+	    visited.companies[company] = {displayed: false};	    
 
-	    var callback = function() {
-		display(person_name, company, this.responseText);
-	    }
+	    var callback = (function(this_person, this_company) {
+		    return function() {
+			console.log("got ajax data for " + this_company);
+			display(this_person, this_company, this.responseText);
+		    }
+		})(person_name, company);
  
   	    ajax(company +  "?fragment=true", callback);
+	} else {
+	    console.log("new connection: " + person_name + " >> " + company);
+	    if(visited.companies[company].displayed) {
+		console.log("(Adding to already displayed company)");
+		display_person(person_name, company);
+	    } else {
+		console.log("adding person connection to company display");
+		if(visited.companies[company].display_callbacks === undefined) {
+		    visited.companies[company].display_callbacks = [];
+		}
+		visited.companies[company].display_callbacks.push(
+								  (function(this_person,this_company){
+								      return function(){
+									  display_person(this_person, this_company)
+								      }
+								  }
+								      )(person_name, company));
+
+	    }
 	}
     }
+}
+
+function link_to_name(link) {
+    var raw = link.split("/").last();
+    return raw.split("-").join(" ");    
 }
 
 function gather_people() {
@@ -42,11 +68,33 @@ function gather_people() {
 	var person = people[i];
 	ajax(
 	     person + "?json=true",
-	     function() {
-		 gather_companies(person, this.responseText);
-	     }
+	     (function(this_person) {
+		 return function(){
+		     gather_companies(this_person, this.responseText);
+		 }
+	     })(person)
 	);
     }
+}
+
+function display_person(person, company) {
+    console.log("adding " + person + " to " + company);
+
+    if(visited.companies[company].people === undefined) {
+	visited.companies[company].people = {};
+    }
+
+    if(visited.companies[company].people[person] !== undefined) {
+	return
+    }
+
+    visited.companies[company].people[person] = {};
+
+    var d = document.createElement("div");
+    d.setAttribute("class", "person connection");
+    d.innerHTML = "<a href='" + person + "'>" + link_to_name(person) + "</a>";
+    visited.companies[company].connections.appendChild(d);
+    visited.companies[company].count.innerHTML = parseInt(visited.companies[company].count.innerText) + 1; 
 }
 
 function display(person, company, raw_data) {
@@ -55,10 +103,32 @@ function display(person, company, raw_data) {
     d.setAttribute("class", "company related");
     d.setAttribute("tabindex", connections++);
     d.innerHTML = raw_data;
+    visited.companies[company].element = d;
     container.appendChild(d);
     console.log("added " + company + " via " + person);
-
     d.addEventListener('keypress', navigate);
+
+    var c = document.createElement("div");
+    c.setAttribute("class", "count");
+    c.innerHTML = "0";
+    d.appendChild(c);
+    visited.companies[company].count = c;
+
+    var people = document.createElement("div");
+    people.setAttribute("class", "connections");
+    d.appendChild(people);
+    visited.companies[company].connections = people;
+
+    console.log("displayed: " + company);
+    console.log(visited.companies[company]);
+
+    display_person(person,company);
+
+    for(var i=0; i<visited.companies[company].display_callbacks.length; i++) {
+	console.log("calling callback");
+	visited.companies[company].display_callbacks[i]();
+    }
+    visited.companies[company].displayed = true;
 }
 
 function navigate(event) {
