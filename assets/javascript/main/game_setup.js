@@ -9,7 +9,7 @@ window.addEventListener(
 		    }
 
 		    if(g.setup) {
-			return true;
+			//			return true;
 		    }
 
 		    e.preventDefault();
@@ -17,6 +17,12 @@ window.addEventListener(
 		}
 	    );
 
+	}
+      );
+
+      x$(".game.start").each(
+        function() {
+	    
 	}
       );
   }

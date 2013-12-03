@@ -59,6 +59,13 @@ function link_to_name(link) {
     return raw.split("-").join(" ");    
 }
 
+function name_to_link(name) {
+    if(name.match("/company/") !== undefined) {
+	return name
+    }
+    return "/company/" + name;
+}
+
 function gather_people() {
     var data = JSON.parse(this.responseText);
     console.log("intermediate data:");
@@ -158,6 +165,9 @@ function initialize() {
     };
 
     ajax(window.location.href + "?json=true",gather_people); 
+    load_game();
+    g.check_progress();
+    console.log("PROGRESS:" + g.progress);
 }
 
 

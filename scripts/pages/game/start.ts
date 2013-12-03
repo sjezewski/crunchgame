@@ -12,7 +12,7 @@ $("//body") {
 
   $("//form") {
 
-    attribute("action", "/company/" + $finish)
+    attribute("action", "/company/" + $start)
 
     $("//input[@name='start']") {
       attribute("value", $start)

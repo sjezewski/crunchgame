@@ -103,10 +103,14 @@ function company_to_people(game, remaining_degrees) {
 }
 
 function merge(a,b) {
-    for(var thing in b) {
-	a[thing] = b[thing];
+    var c = {};
+    for(var thing in b) {	
+	c[thing] = b[thing];
+	if(a[thing] !== undefined) {
+	    c[thing] = a[thing];
+	}
     }
-    return a;
+    return c;
 }
 
 function new_game() {
@@ -148,6 +152,9 @@ function gather_options() {
 function Game(options) {
 
     this.options = merge(options, defaults);
+    this.options.degrees = parseInt(this.options.degrees);
+    this.options.start = name_to_link(this.options.start);
+    console.log(options);
     this.solution = {};
     this.current = [this.options.start];
 }
@@ -155,7 +162,7 @@ function Game(options) {
 var defaults ={
 	'degrees':6,
 	'any':false,
-	'start':'/company/moovweb'
+	'start':'moovweb'
 };
 
 Game.prototype = {
@@ -231,7 +238,7 @@ Game.prototype = {
 
     },
     check_progress: function() {
-	var user_current = link_to_name(window.location.pathname);
+	var user_current = window.location.pathname;
 	var done = false;
 	var current = this.options.start;
 	var progress = 1;
@@ -242,6 +249,7 @@ Game.prototype = {
 	while(!done) {
 	    progress++;
 	    var next = this.solution[current];
+	    console.log("progress:" + progress + ", user_current:" + user_current + ", next:" + next);
 	    if(next == user_current || next === undefined) {
 		done = true;
 	    }
@@ -249,6 +257,7 @@ Game.prototype = {
 		done=true;
 		console.log("went too far!!!");
 	    }
+	    current = next;
 	}
 
 	this.progress = progress;
@@ -256,7 +265,7 @@ Game.prototype = {
 	if(progress == this.options.degrees) {
 	    this.finish();
 	}
-
+	
     },
     finish: function() {
 	this.display();
