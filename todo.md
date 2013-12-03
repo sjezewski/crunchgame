@@ -1,11 +1,10 @@
 To be done:
 
-- detect user solution
-- show solution
 - add a header
   - make easy 'start game here' button
   - make 'see solution' button
   - style header
+- show solution
 - locally cache the raw company html fragments
 - show progress bar during solution
 - keep track of connections (people) for solution
@@ -19,6 +18,8 @@ Questions:
 
 - should the code detect when you've seen the final company?
   - if yes, should it do so when you've navigated there? or can see it?
+- perhaps I should set a cookie to denote a game is in progress
+  - so I can serve the right content / classes for the header
 
 Done:
 
@@ -27,5 +28,6 @@ Done:
 - make setup + start game templates
 - generate valid solution
 - hook in setup + start game pages to be functional
+- detect user solution
 
 

@@ -8,9 +8,11 @@ $("/html") {
 
   add_assets()
 
+
+  @import mappings.ts
+
   @import sections/header.ts
   @import sections/footer.ts
 
-  @import mappings.ts
 }
 

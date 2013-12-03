@@ -2,6 +2,16 @@
 ### Site Functions
 ####################
 
+@func fetch_cookie(Text %name) {
+  $value = ""
+  $cookie {
+    replace(regexp(%name + "=(.*?)[;\Z]")) {
+     $value = $1
+    }
+  } 
+  $value
+}
+
 # BTN DELEGATE
 # 
 # EXAMPLE CSS

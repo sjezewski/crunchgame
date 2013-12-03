@@ -10,13 +10,6 @@ function person_to_company(game, remaining_degrees, person) {
 		var data = JSON.parse(this.responseText);
 		var companies = data.companies;
 		var scrubbed = this_game.scrub(companies);
-		console.log(this_person + ">>>>>>>>>>");
-		console.log("got companies:");
-		console.log(companies);		
-		console.log("scrubeed companies:");
-		console.log(scrubbed);
-
-
 
 		if(scrubbed.length == 0) {
 		    if (this_game.current.length != 1) {
@@ -60,8 +53,6 @@ function company_to_people(game, remaining_degrees) {
 
     var callback = (function(this_game, degrees, this_company){
 	return function() {
-	    console.log("raw:");
-	    console.log(this);
 	    var data = JSON.parse(this.responseText);
 	    var people = data.people;
 	    console.log("got people");
@@ -120,19 +111,20 @@ function new_game() {
 }
 
 function load_game() {
-    var saved_game = load_game_data();
-
-    g = new Game(saved_game);
-    g.solution = saved_game.solution;    
+    try {
+	var saved_game = load_game_data();
+	
+	g = new Game(saved_game);
+	g.solution = saved_game.solution;    
+	return g;
+    } catch(e) {
+	console.log("Couldn't load game from data:(" + localStorage.game + ")");
+	return null;
+    }
 }
 
 function load_game_data() {
-    try {
-	return JSON.parse(localStorage.game);
-    } catch(e) {
-	console.log("failed to load / parse game data:", e);
-    }
-
+    return JSON.parse(localStorage.game);
 }
 
 function gather_options() {
@@ -140,11 +132,8 @@ function gather_options() {
 
     for(var option in defaults) {
 	var value = x$("input[name='" + option + "']")[0].value;
-	console.log("gathered option:" + value);
 	options[option] = value;
     }
-
-    console.log("loaded options:",options);
 
     return options;
 }
@@ -154,7 +143,7 @@ function Game(options) {
     this.options = merge(options, defaults);
     this.options.degrees = parseInt(this.options.degrees);
     this.options.start = name_to_link(this.options.start);
-    console.log(options);
+    console.log("OMG THE START IS:" + this.options.start);
     this.solution = {};
     this.current = [this.options.start];
 }
@@ -181,6 +170,10 @@ Game.prototype = {
 	}
 	game_data.solution = this.solution;
 	localStorage.game = JSON.stringify(game_data);
+
+	document.cookie = "game_in_progress=true";
+	document.cookie = "endpoint=" + link_to_name(this.current.last());
+
     },
     scrub: function(vertices) {
 	// Given the options for the next jump, remove steps we've already used
@@ -189,14 +182,8 @@ Game.prototype = {
 	var lastIndex = vertices.length;
 	while(!done) {
 	    i++;
-	    console.log("checking [" + i + "]: " + vertices[i]);
 	    if(this.reject(vertices[i])) {
-		console.log("removing " + i + "th entry : " + vertices[i]);
-		console.log("before:");
-		console.log(vertices); 
 		vertices = vertices.slice(0,i).concat(vertices.slice(i+1,vertices.length));
-		console.log("after:");
-		console.log(vertices); 
 		i--;
 		lastIndex--;
 	    }
@@ -211,8 +198,6 @@ Game.prototype = {
 
     reject: function(new_value) {
 	var reject = false;
-	console.log("last:" + this.current.last());
-	console.log("seen before:" + this.solution[new_value]);
 	if(new_value == this.current.last() || this.solution[new_value] !== undefined) {
 	    console.log("rejected ... same as current");
 	    console.log("rejected ... already seen this company");
@@ -249,7 +234,6 @@ Game.prototype = {
 	while(!done) {
 	    progress++;
 	    var next = this.solution[current];
-	    console.log("progress:" + progress + ", user_current:" + user_current + ", next:" + next);
 	    if(next == user_current || next === undefined) {
 		done = true;
 	    }
@@ -269,6 +253,7 @@ Game.prototype = {
     },
     finish: function() {
 	this.display();
+	localStorage.game = "";
 	alert("You won the game!");	
     },
     solution: function() {

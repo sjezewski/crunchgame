@@ -60,7 +60,7 @@ function link_to_name(link) {
 }
 
 function name_to_link(name) {
-    if(name.match("/company/") !== undefined) {
+    if(name.match("/company/") !== null) {
 	return name
     }
     return "/company/" + name;
@@ -165,9 +165,6 @@ function initialize() {
     };
 
     ajax(window.location.href + "?json=true",gather_people); 
-    load_game();
-    g.check_progress();
-    console.log("PROGRESS:" + g.progress);
 }
 
 
