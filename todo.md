@@ -1,11 +1,7 @@
 To be done:
 
-- add a header
-  - make easy 'start game here' button
-  - make 'see solution' button
-  - style header
-- show solution
 - locally cache the raw company html fragments
+- show solution
 - show progress bar during solution
 - keep track of connections (people) for solution
 - check and report time elapsed for game
@@ -29,5 +25,9 @@ Done:
 - generate valid solution
 - hook in setup + start game pages to be functional
 - detect user solution
+- add a header
+  - make easy 'start game here' button
+  - style header
+  - add solution button
 
 
